@@ -191,7 +191,7 @@ getHardwareID()
         if [ "$token" = "" ]; then
 	    userLogin
         fi
-        result=$(curl ${CURL_OPTS} 'POST' $getHWIDURL -d "{\"deviceaddress\":\"$deviceaddress\", \"secret\":\"$secret\" }" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
+        result=$(curl ${CURL_OPTS} 'POST' $getHWIDURL -d "{\"deviceaddress\":\"$deviceaddress\", \"secret\":\"$secret\" }" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
         HardwareID=$(jsonval "$result" "hardware_id")
     else
 	setHardwareID
@@ -248,7 +248,7 @@ checkForServices()
             yooareell="$deviceURL/$uid"
             debug "$yooareell"
 
-	    resp=$(curl ${CURL_OPTS} GET -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$yooareell")
+	    resp=$(curl ${CURL_OPTS} GET "$CURL_HDR" -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$yooareell")
             checkAPIResult "$yooareell" "$resp"
 
 	    # this next test checks to see if device is registered.  
@@ -700,7 +700,7 @@ deleteConnection()
         uid="$(grep '^UID' "$file" | awk '{print $2}')"
 	yooareell="$deviceURL/$uid"
 
-	resp=$(curl ${CURL_OPTS} GET -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$yooareell")
+	resp=$(curl ${CURL_OPTS} GET "$CURL_HDR" -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$yooareell")
 
         serviceName=$(jsonval "$resp" "name")
 
@@ -718,7 +718,7 @@ deleteConnection()
 	    if ask "Are you sure you want to delete the remote.it $deviceType Service $serviceName?"; then
 		printf "Deleting %s... this may take up to 30 seconds.\n" "$serviceName"
 
-		result=$(curl ${CURL_OPTS} 'POST' $deleteURL -d "{\"deviceaddress\":\"$uid\"}" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
+		result=$(curl ${CURL_OPTS} 'POST' $deleteURL -d "{\"deviceaddress\":\"$uid\"}" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
 
                 checkAPIResult "$deleteURL" "$result"
 
@@ -761,11 +761,11 @@ deleteAllConnections()
     	for file in "$CONNECTD_CONF_DIR"/*.conf; do
 	# get service name from UID
             uid="$(grep '^UID' "$file" | awk '{print $2}')"
-	    resp=$(curl ${CURL_OPTS} GET -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$deviceURL/$uid")
+	    resp=$(curl ${CURL_OPTS} GET "$CURL_HDR" -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$deviceURL/$uid")
             serviceName="$(jsonval "$resp" name)"
 
 	    printf "Deleting %s... this may take up to 30 seconds.\n" "$serviceName"
-	    result=$(curl ${CURL_OPTS} 'POST' $deleteURL -d "{\"deviceaddress\":\"$uid\"}" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
+	    result=$(curl ${CURL_OPTS} 'POST' $deleteURL -d "{\"deviceaddress\":\"$uid\"}" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
             checkAPIResult "$deleteURL" "$result"
 
 	    fn=$(basename "$file")
@@ -872,7 +872,7 @@ getEmail()
 registerUser()
 {
     getEmail
-    resp=$(curl ${CURL_OPTS} 'POST' $regAccountURL -d "{\"email\":\"$username\"}" -H "content-type:application/json" -H "apikey:$apikey" 2> "$TMP_DIR"/.curlerr)
+    resp=$(curl ${CURL_OPTS} 'POST' $regAccountURL -d "{\"email\":\"$username\"}" "$CURL_HDR" -H "content-type:application/json" -H "apikey:$apikey" 2> "$TMP_DIR"/.curlerr)
 
     debug "$resp"
     value=$(jsonval "$resp" "status") 
@@ -902,7 +902,7 @@ enterVerificationCode()
     	getNewPassword
     done
 
-     resp=$(curl ${CURL_OPTS} 'POST' $regAccountURLVerified -d "{\"email\":\"$username\", \"password\":\"$password\", \"shortcode\":\"$registrationCode\"}" -H "content-type:application/json" -H "apikey:$apikey" 2> "$TMP_DIR"/.curlerr)
+     resp=$(curl ${CURL_OPTS} 'POST' $regAccountURLVerified -d "{\"email\":\"$username\", \"password\":\"$password\", \"shortcode\":\"$registrationCode\"}" "$CURL_HDR" -H "content-type:application/json" -H "apikey:$apikey" 2> "$TMP_DIR"/.curlerr)
 
     debug "$resp"
     value=$(jsonval "$resp" "status") 
@@ -1030,9 +1030,9 @@ signInAPI()
     debug "U:$username P:$password A:$authhash D:$apikey"
     # if AUTHHASH is REPLACE_AUTHHASH it means user just wants to use password
     if [ "$AUTHHASH" = "REPLACE_AUTHHASH" ]; then
-          resp=$(curl ${CURL_OPTS} 'POST' -H "apikey:$apikey" -H "Content-Type:application/json" -H "Cache-Control:no-cache" -d "{ \"username\" : \"$username\", \"password\" : \"$password\" }" "$loginURL" 2> "$TMP_DIR"/.curlerr)
+          resp=$(curl ${CURL_OPTS} 'POST' "$CURL_HDR" -H "apikey:$apikey" -H "Content-Type:application/json" -H "Cache-Control:no-cache" -d "{ \"username\" : \"$username\", \"password\" : \"$password\" }" "$loginURL" 2> "$TMP_DIR"/.curlerr)
     else
-             resp=$(curl ${CURL_OPTS} 'POST' -H "apikey:$apikey" -H "Content-Type:application/json" -H "Cache-Control:no-cache" -d "{ \"username\" : \"$username\", \"authhash\" : \"$AUTHHASH\" }" "$loginAuthURL" 2> "$TMP_DIR"/.curlerr)
+             resp=$(curl ${CURL_OPTS} 'POST' "$CURL_HDR" -H "apikey:$apikey" -H "Content-Type:application/json" -H "Cache-Control:no-cache" -d "{ \"username\" : \"$username\", \"authhash\" : \"$AUTHHASH\" }" "$loginAuthURL" 2> "$TMP_DIR"/.curlerr)
     fi
 #    checkAPIResult 'login' "$resp"
 
@@ -1115,7 +1115,7 @@ checkForDeviceName()
             port="$(grep '^port' "$rmt3provFile" | awk '{print $2}')"
 	    yooareell="$deviceURL/$uid"
 
-	    resp=$(curl ${CURL_OPTS} GET -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$yooareell")
+	    resp=$(curl ${CURL_OPTS} GET "$CURL_HDR" -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$yooareell")
             checkAPIResult "$yooareell" "$resp"
 
 	    # this next test checks to see if device is registered.  
@@ -1165,7 +1165,7 @@ convertExistingUIDs()
 	# get service name from UID
                 uid="$(grep '^UID' "$file" | awk '{print $2}')"
 
-                result=$(curl ${CURL_OPTS} 'POST' $deviceHWIDURL -d "{\"deviceaddress\":\"$uid\", \"hardwareid\":\"$HardwareID\"}" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token" 2> /"$TMP_DIR"/.curlerr)
+                result=$(curl ${CURL_OPTS} 'POST' $deviceHWIDURL -d "{\"deviceaddress\":\"$uid\", \"hardwareid\":\"$HardwareID\"}" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token" 2> /"$TMP_DIR"/.curlerr)
 
                 checkAPIResult "$deviceHWIDURL" "$result"
 
@@ -1232,7 +1232,7 @@ installProvisioning()
 # next we look to see if this project has already been created
 #    echo "projectListURL: $projectListURL"
 
-    resp=$(curl ${CURL_OPTS} GET -H "content-type:application/json" -H "apikey:$apikey" -H "token:$token" "$projectListURL")
+    resp=$(curl ${CURL_OPTS} GET "$CURL_HDR" -H "content-type:application/json" -H "apikey:$apikey" -H "token:$token" "$projectListURL")
 #    echo "$resp"
 #    read anykey
     # parse the sections into individual lines
@@ -1278,7 +1278,7 @@ installProvisioning()
             exit
         fi	
 
-        result=$(curl ${CURL_OPTS} 'POST' $projectCreateURL -d "{\"projectname\":\"$projectName\", \"projecttype\":\"device\", \"platformversion\":\"1.0\",\"platformtype\":\"$platformType\",\"contenttype\":\"$contentType\",\"contentport\":\"$PORT\" }" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
+        result=$(curl ${CURL_OPTS} 'POST' $projectCreateURL -d "{\"projectname\":\"$projectName\", \"projecttype\":\"device\", \"platformversion\":\"1.0\",\"platformtype\":\"$platformType\",\"contenttype\":\"$contentType\",\"contentport\":\"$PORT\" }" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
 #        echo "$result"
         checkAPIResult "$projectCreateURL" "$result"
         projectID=$(jsonval "$result" "projectid") 
@@ -1287,7 +1287,7 @@ installProvisioning()
        projectID="$(echo $findLine | sed -e 's/,/\n''/g' | grep "projectid" | awk -F":" '{print $2 }')"
     fi
     debug "Project ID: $projectID"
-    resp=$(curl ${CURL_OPTS} GET -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$projectFileLinkURL/$projectID")
+    resp=$(curl ${CURL_OPTS} GET "$CURL_HDR" -H "content-type:application/json" -H "apikey:$apikey"  -H "token:$token" "$projectFileLinkURL/$projectID")
 #    echo "resp: $resp"
     checkAPIResult "$projectFileLinkURL/$projectID" "$resp"
     downloadLink1=$(jsonval "$resp" "file")
@@ -1473,7 +1473,7 @@ preregisterUID()
     printf "."
     debug "devicetype = $DEVICETYPE"
 
-    preregUID="$(curl ${CURL_OPTS} 'POST' $preregdeviceURL -d "{\"deviceaddress\":\"$uid\", \"devicetype\":\"$DEVICETYPE\"}" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")"
+    preregUID="$(curl ${CURL_OPTS} 'POST' $preregdeviceURL -d "{\"deviceaddress\":\"$uid\", \"devicetype\":\"$DEVICETYPE\"}" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")"
     checkAPIResult "$preregdeviceURL" "$preregUID"
 
     test1="$(echo "$preregUID" | grep -c "true" )"
@@ -1525,11 +1525,11 @@ registerDevice()
     while [ "$result" != "true" ]; do
 
         if [ "$PROTOCOL" = "rmt3" ]; then
-            secretCall="$(curl ${CURL_OPTS} 'POST' $regdeviceURL -d "{\"deviceaddress\":\"$uid\",  \"devicetype\":\"$DEVICETYPE\", \"devicealias\":\"$alias\", \"skipsecret\":\"true\", \"hardwareid\":\"$HardwareID\"}" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")"    
+            secretCall="$(curl ${CURL_OPTS} 'POST' $regdeviceURL -d "{\"deviceaddress\":\"$uid\",  \"devicetype\":\"$DEVICETYPE\", \"devicealias\":\"$alias\", \"skipsecret\":\"true\", \"hardwareid\":\"$HardwareID\"}" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")"    
         else
 	# if it's not the bulk service, set the "skip email" flag so that only one regsitration e-mail 
         # per device is sent
-            secretCall="$(curl ${CURL_OPTS} 'POST' $regdeviceURL -d "{\"deviceaddress\":\"$uid\",  \"devicetype\":\"$DEVICETYPE\", \"devicealias\":\"$alias\", \"skipsecret\":\"true\", \"hardwareid\":\"$HardwareID\", \"skipemail\":\"true\"}" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")"
+            secretCall="$(curl ${CURL_OPTS} 'POST' $regdeviceURL -d "{\"deviceaddress\":\"$uid\",  \"devicetype\":\"$DEVICETYPE\", \"devicealias\":\"$alias\", \"skipsecret\":\"true\", \"hardwareid\":\"$HardwareID\", \"skipemail\":\"true\"}" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")"
         fi
 
         error="$(jsonval "$secretCall" "Error")"
@@ -1607,7 +1607,7 @@ deleteDevice()
 {
     printf "Deleting %s... this may take up to 30 seconds.\n" "$CONNECTD_PORT"
     uid=$(grep ^UID "$CONNECTD_CONF_DIR"/"$CONNECTD_PORT".conf | awk '{print $2}' )
-    result=$(curl ${CURL_OPTS} 'POST' $deleteURL -d "{\"deviceaddress\":\"$uid\"}" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
+    result=$(curl ${CURL_OPTS} 'POST' $deleteURL -d "{\"deviceaddress\":\"$uid\"}" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
     checkAPIResult "$deleteURL $uid" "$result"
 
     #    printf "\n\n"
@@ -1618,7 +1618,7 @@ deleteDevice()
 deleteDeviceByUid()
 {
     uid="$1"
-    resp=$(curl ${CURL_OPTS} 'POST' $deleteURL -d "{\"deviceaddress\":\"$uid\"}" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
+    resp=$(curl ${CURL_OPTS} 'POST' $deleteURL -d "{\"deviceaddress\":\"$uid\"}" "$CURL_HDR" -H "Content-Type:application/json" -H "apikey:$apikey" -H "token:$token")
     checkAPIResult "$deleteURL $uid" "$resp"
 }
 ######### End Delete device by UID #########
