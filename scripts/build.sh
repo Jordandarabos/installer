@@ -255,15 +255,15 @@ fi
 # add the test account credentials.
 add_creds
 
-"$TEST_DIR"/Interactive/full-interactive-test.sh
+sudo "$TEST_DIR"/Auto_Registration/full-reg-test.sh
 if [ $? -ne 0 ]; then
-    echo "Interactive Registration failure!"
+    echo "Auto Registration failure!"
     exit 1
 fi
 
-sudo "$TEST_DIR"/Auto_Registration/auto-reg-test.sh
+"$TEST_DIR"/Interactive/full-interactive-test.sh
 if [ $? -ne 0 ]; then
-    echo "Auto Registration failure!"
+    echo "Interactive Registration failure!"
     exit 1
 fi
 
