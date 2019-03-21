@@ -1,56 +1,50 @@
 #!/bin/sh
-# there are some manual steps here which should get replaced by API calls
-# when possible.
+# adding integration with Doug's php API tester code
 
-. /usr/bin/connectd_library
+SCRIPT_DIR="$(cd $(dirname $0) && pwd)"
 
 countServices()
 {
     echo
-    connectd_control status all
-    nrunning=$(connectd_control status all | grep -c "and running")
+    sudo connectd_control status all
+    nrunning=$(sudo connectd_control status all | grep -c "and running")
     echo "$nrunning are running"
-    nstopped=$(connectd_control status all | grep -c stopped)
+    nstopped=$(sudo connectd_control status all | grep -c stopped)
     echo "$nstopped are stopped"
-    nenabled=$(connectd_control status all | grep -c enabled)
+    nenabled=$(sudo connectd_control status all | grep -c enabled)
     echo "$nenabled are enabled"
-    ndisabled=$(connectd_control status all | grep -c disabled)
+    ndisabled=$(sudo connectd_control status all | grep -c disabled)
     echo "$ndisabled are disabled"
     echo
 }
 
-checkForRoot
+echo "Creating new product definition and auto-registration..."
+bulk_id=$("$SCRIPT_DIR"/auto_registration_with_device/create_product_and_auto_reg.sh | grep "BulkId" | awk -F"=" '{ print $2 }')
+echo "bulk_id=$bulk_id"
 
-echo "About to start initial auto-registration"
-echo "Make sure the bulk id code is for an auto registration with at least service."
-echo "Press Enter when ready."
-read anykey
-sed -i -e 's/1233F068-A3F9-9C3F-006F-FBFA9D018813/1233F068-A3F9-9C3F-006F-FBFA9D018813/' ./auto-reg-test.sh
-./auto-reg-test.sh
-connectd_control start all
+# need to set Bulk Identification Code here
+
+sudo "$SCRIPT_DIR"/auto-reg-test.sh
+sudo connectd_control start all
 echo
 echo "You should now have some services running."
 echo "Check the counts below."
 countServices
 
 echo "Now add a new Service and enable it."
-echo "Press Enter when ready."
-read anykey
 
-connectd_control -v dprovision
-connectd_control -v bprovision all
+sudo connectd_control -v dprovision
+sudo connectd_control -v bprovision all
 
 echo
 echo "You should now have 1 more service running."
 countServices
 
 echo
-echo "Now disable a Service."
-echo "Press Enter when ready."
-read anykey
+# echo "Now disable a Service."
 
-connectd_control -v dprovision
-connectd_control -v bprovision all
+sudo connectd_control -v dprovision
+sudo connectd_control -v bprovision all
 
 echo
 echo "You should now have 1 fewer services running."
@@ -58,12 +52,12 @@ countServices
 
 echo
 echo "Now re-enable the Service."
-echo "Press Enter when ready."
-read anykey
 
-connectd_control -v dprovision
-connectd_control -v bprovision all
+sudo connectd_control -v dprovision
+sudo connectd_control -v bprovision all
 
 echo
 echo "You should now have 1 more service running."
 countServices
+
+"$SCRIPT_DIR"/auto_registration_with_device/cleanup_product_and_auto_reg.sh

@@ -1,0 +1,84 @@
+SKIP;;HERE; skipping ahead;;
+HERE;;; skipping ahead;;
+POST;200;/user/login/;developerkey=<developerkey>;{"username":"<username>","password":"<password>"};token=<token>,service_authhash=<service_authhash>
+# Create Product
+RANDOM_STRING;;;<newproduct>;-auto-reg;
+POST;200;/developer/product/;developerkey=<developerkey>,token=<token>;{"name":"<newproduct>","platform":"430","scope":"private"};productid=<productid>
+GET;200;/developer/product/list/mine/;developerkey=<developerkey>,token=<token>;;
+#
+# add projects
+RANDOM_STRING;;;<newssh>;-auto-reg-ssh;
+POST;200;/developer/product/add/project/;developerkey=<developerkey>,token=<token>;{"product_id":"<productid>","name":"<newssh>","type":"28","localport":"22","version":"1.0","enabled":"1"};project_id=<project_id>
+##RANDOM_STRING;;;<newrdp>;-auto-reg-vnc;
+##POST;200;/developer/product/add/project/;developerkey=<developerkey>,token=<token>;{"product_id":"<productid>","name":"<newvnc>","type":"4","localport":"5900","version":"1.0","enabled":"1"};project_id=<project_id>
+##RANDOM_STRING;;;<newnx>;-auto-reg-nx;
+##POST;200;/developer/product/add/project/;developerkey=<developerkey>,token=<token>;{"product_id":"<productid>","name":"<newnx>","type":"37","localport":"7001","version":"1.0","enabled":"1"};project_id2=<project_id2>
+#
+GET;200;/developer/product/projects/:productid;developerkey=<developerkey>,token=<token>;;
+#
+# Lock product
+POST;200;/developer/product/settings/;developerkey=<developerkey>,token=<token>;{"product_id":"<productid>","lock":"on"};
+#
+GET;200;/developer/product/project/identification/:productid;developerkey=<developerkey>,token=<token>;;bulk_ID_code=<project_id>
+#
+# Create Auto Registration
+POST;200;/bulk/registration/create/;developerkey=<developerkey>,token=<token>;{"name":"<newproduct>","product":"<productid>","type":"open"};bulk_id=<bulk_id>
+POST;200;/bulk/registration/open/settings/;developerkey=<developerkey>,token=<token>;{"bulk_id":"<bulk_id>","allow":"on","lock":"on","product":""};
+GET;200;/bulk/register/details/:bulk_id;developerkey=<developerkey>,token=<token>;;
+#
+RANDOM_STRING;;;<hwid>;-hwid;
+RANDOM_STRING;;;<regkey>;-regkey;
+#
+ECHO;;ProductId=;<productid>;;
+ECHO;;BulkIdentificationCode=;<bulk_ID_code>;;
+ECHO;;HardwareId=;<hwid>;;
+ECHO;;RegistrationKey=;<regkey>;;
+#
+SAVE_CONTEXT;;;;;
+EXIT;;; Exit here;;
+#
+# Add device - not needed when testing a real device
+#
+POST;200;/bulk/registration/register/;developerkey=<developerkey>,token=<token>;{"hardware_id":"<hwid>","registration_key":"<regkey>","project_id":"<project_id>","queue_name":"<task_queue>"};;
+WAIT;;80;wait for registration to start;;
+POST;200;/bulk/registration/register/;developerkey=<developerkey>,token=<token>;{"hardware_id":"<hwid>","registration_key":"<regkey>","project_id":"<project_id>","queue_name":"<task_queue>"};;
+WAIT;;80;wait for registration to progress;;
+POST;200;/bulk/registration/register/;developerkey=<developerkey>,token=<token>;{"hardware_id":"<hwid>","registration_key":"<regkey>","project_id":"<project_id>","queue_name":"<task_queue>"};;
+WAIT;;80;wait for registration to complete;;
+GET;200;/bulk/register/details/:bulk_id;developerkey=<developerkey>,token=<token>;;
+#
+# add a new service 
+RANDOM_STRING;;;<newrdp>;-auto-reg-rdp;
+POST;200;/developer/product/add/project/;developerkey=<developerkey>,token=<token>;{"product_id":"<productid>","name":"<newrdp>","type":"5","localport":"3389","version":"1.0","enabled":"1"};project_id_new=<project_id>
+#
+# enable the service on the bulk - must call configuration list first to pickup changes
+GET;200;/bulk/registration/service/configuration/list/:bulk_id;developerkey=<developerkey>,token=<token>;;
+POST;200;/bulk/registration/service/configuration/;developerkey=<developerkey>,token=<token>;{"bulk_id":"<bulk_id>","port":"3389","ip":"-","enabled":"1","project_id":"<project_id_new>"};
+GET;200;/bulk/register/details/:bulk_id;developerkey=<developerkey>,token=<token>;;
+#
+# register again to add the new service on the existing device
+POST;200;/bulk/registration/register/;developerkey=<developerkey>,token=<token>;{"hardware_id":"<hwid>","registration_key":"<regkey>","project_id":"<project_id_new>","queue_name":"<task_queue>"};;
+#
+WAIT;;80;wait for registration to start;;
+POST;200;/bulk/registration/register/;developerkey=<developerkey>,token=<token>;{"hardware_id":"<hwid>","registration_key":"<regkey>","project_id":"<project_id_new>","queue_name":"<task_queue>"};;
+WAIT;;80;wait for registration to progress;;
+POST;200;/bulk/registration/register/;developerkey=<developerkey>,token=<token>;{"hardware_id":"<hwid>","registration_key":"<regkey>","project_id":"<project_id_new>","queue_name":"<task_queue>"};;
+#
+GET;200;/bulk/registration/device/friendly/configuration/:project_id_new/:hwid/;developerkey=<developerkey>,token=<token>;;
+GET;200;/bulk/registration/configuration/:project_id_new/:hwid/;developerkey=<developerkey>,token=<token>;;
+#
+# Restart here to continue testing
+#
+CLEANUP;;;restarting with cleanup ...;;
+#
+# verify registration
+GET;200;/bulk/register/details/:bulk_id;developerkey=<developerkey>,token=<token>;;
+#
+POST;200;/bulk/registration/unregister/;developerkey=<developerkey>,token=<token>;{"bulk_id":"<bulk_id>","authhash":"<service_authhash>","queue_name":"<task_queue>"};;
+WAIT;;60;wait for un-registration;;
+#
+# Cleanup registration & product
+POST;200;/bulk/registration/delete/;developerkey=<developerkey>,token=<token>;{"bulk_id":"<bulk_id>","permanent":"true","permenant":"true"};;
+DELETE;200;/developer/product/;developerkey=<developerkey>,token=<token>;{"productid":"<productid>"};
+#
+EXIT;;; Exit here;;

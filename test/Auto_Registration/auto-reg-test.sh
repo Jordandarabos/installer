@@ -15,7 +15,7 @@ result=0
 # This one is from the faultline1989 account.
 
 #---------------------------------------------
-BULKIDCODE="1233F068-A3F9-9C3F-006F-FBFA9D018813"
+# BULKIDCODE="1233F068-A3F9-9C3F-006F-FBFA9D018813"
 
 # include the package library to access some utility functions
 
@@ -28,7 +28,7 @@ echo
 echo "API:"
 # the next line can be used as needed to override a specific API version
 # comment this line out to return to default API
-sed -i -e 's/\/api/\/apv\/v27.5/' /usr/bin/connectd_options
+# sed -i -e 's/\/api/\/apv\/v27.5/' /usr/bin/connectd_options
 grep ^api /usr/bin/connectd_options
 echo
 
@@ -39,13 +39,13 @@ checkForRoot
 
 # generate a new Hardware ID
 
-uuid > /etc/connectd/hardware_id.txt
+# uuid > /etc/connectd/hardware_id.txt
 
 # generate a new Registration Key
 
-uuid > /etc/connectd/registration_key.txt
+# uuid > /etc/connectd/registration_key.txt
 
-echo "$BULKIDCODE" > /etc/connectd/bulk_identification_code.txt
+# echo "$BULKIDCODE" > /etc/connectd/bulk_identification_code.txt
 
 # display bulk registration configuration
 
