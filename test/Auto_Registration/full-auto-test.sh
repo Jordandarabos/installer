@@ -23,6 +23,7 @@ bulk_id=$("$SCRIPT_DIR"/auto_registration_with_device/create_product_and_auto_re
 echo "bulk_id=$bulk_id"
 
 # need to set Bulk Identification Code here
+sudo bash -c "echo $bulk_id > /etc/connectd/bulk_identification_code.txt"
 
 sudo "$SCRIPT_DIR"/auto-reg-test.sh
 sudo connectd_control start all
@@ -31,33 +32,33 @@ echo "You should now have some services running."
 echo "Check the counts below."
 countServices
 
-echo "Now add a new Service and enable it."
+echo "[PLACE HOLDER] Now add a new Service and enable it."
 
 sudo connectd_control -v dprovision
 sudo connectd_control -v bprovision all
 
 echo
-echo "You should now have 1 more service running."
+echo "[PLACE HOLDER] You should now have 1 more service running."
 countServices
 
 echo
-# echo "Now disable a Service."
+echo "[PLACE HOLDER] Now disable a Service."
 
 sudo connectd_control -v dprovision
 sudo connectd_control -v bprovision all
 
 echo
-echo "You should now have 1 fewer services running."
+echo "[PLACE HOLDER] You should now have 1 fewer services running."
 countServices
 
 echo
-echo "Now re-enable the Service."
+echo "[PLACE HOLDER] Now re-enable the Service."
 
 sudo connectd_control -v dprovision
 sudo connectd_control -v bprovision all
 
 echo
-echo "You should now have 1 more service running."
+echo "[PLACE HOLDER] You should now have 1 more service running."
 countServices
 
 "$SCRIPT_DIR"/auto_registration_with_device/cleanup_product_and_auto_reg.sh
