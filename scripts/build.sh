@@ -255,7 +255,7 @@ fi
 # add the test account credentials.
 add_creds
 
-sudo "$TEST_DIR"/Auto_Registration/full-reg-test.sh
+sudo "$TEST_DIR"/Auto_Registration/full-auto-test.sh
 if [ $? -ne 0 ]; then
     echo "Auto Registration failure!"
     exit 1
