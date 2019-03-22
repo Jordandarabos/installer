@@ -2,7 +2,7 @@
 // usage: api_tester.php <config_file> <test_csv_file> <scope> <endpoint>
 // example php ../api_tester.php config.ini test.csv [detail | summary] https://api01.remot3.it/apv/latest
 
-// include_once "TestUtilities.php";
+include_once "TestUtilities.php";
 $GLOBALS['responses'] = array();
 $GLOBALS['failedcalls'] = array();
 
