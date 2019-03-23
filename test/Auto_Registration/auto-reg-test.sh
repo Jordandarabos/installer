@@ -28,7 +28,7 @@ echo
 echo "API:"
 # the next line can be used as needed to override a specific API version
 # comment this line out to return to default API
-# sed -i -e 's/\/api/\/apv\/v27.5/' /usr/bin/connectd_options
+sed -i -e 's/\/api/\/apv\/v27.5/' /usr/bin/connectd_options
 grep ^api /usr/bin/connectd_options
 echo
 
