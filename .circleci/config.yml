@@ -26,7 +26,7 @@ jobs:
           command: sudo apt-get install lintian
       - run:
           name: Install php
-          command: sudo apt-get install php
+          command: sudo apt-get install php php-curl
       - run:
           name: Install uuid
           command: sudo apt-get install uuid
