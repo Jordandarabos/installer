@@ -9,6 +9,8 @@
 VERSION=2.3.17
 BUILDPATH=https://github.com/remoteit/installer/releases/download/v$VERSION
 LOGFILE=remote.itBinaryTestLog.txt
+# set FORCETAR to 1 to download a tar package on a Debian OS
+FORCETAR=0
 
 downloadAndTestDaemon()
 {
@@ -30,14 +32,12 @@ downloadAndTestDaemon()
     ./"$testDaemon" -n > /dev/null
     if [ "$?" = "0" ]; then
         printf "%s\n" "$testDaemon is compatible!" | tee -a $LOGFILE
-        mv $testDaemon /usr/bin/"$testDaemon"
 	retval=0
     else
         echo "."
-        # printf "%s\n" "$testDaemon is not compatible!" | tee -a $LOGFILE       
-	rm "$testDaemon"
         retval=1
     fi
+    rm "$testDaemon"
     return $retval
 }
 
@@ -54,9 +54,7 @@ downloadSchannel()
 	    exit 1
         fi
     fi
-    sleep 2
-    chmod +x "$testDaemon"
-    mv $testDaemon /usr/bin/connectd_"$testDaemon"
+    rm $testDaemon
     echo $retval
 }
 
@@ -143,12 +141,14 @@ echo "Detected architecture is $BASEPLATFORM"
 
 # see if Debian "dpkg" utility is installed.
 useTar=1
-which dpkg
+if [ $FORCETAR -eq 0 ]; then
+    which dpkg
 
-if [ $? -eq 0 ]; then
-    dpkg --help > /dev/null
-    if [ $? = 0 ]; then
-        useTar=0
+    if [ $? -eq 0 ]; then
+        dpkg --help > /dev/null
+        if [ $? = 0 ]; then
+            useTar=0
+        fi
     fi
 fi
 if [ $useTar -eq 1 ]; then
@@ -292,10 +292,15 @@ if [ $useTar -eq 1 ]; then
     filepath="$BUILDPATH"/"$filename"
     echo "filepath $filepath"
     curl -sLkO "$filepath" > /dev/null
-    ls -l "$filename"
-    mv "$filename" /
-    cd /
-    tar xvf "$filename"  > "$currentFolder"/connectd_"$VERSION"_files.txt
+    echo
+    echo "We have downloaded the file $filename"
+    echo "to the current folder."
+    echo
+    echo "IMPORTANT NOTICE:"
+    echo
+    echo 'Please visit https://docs.remote.it and search for "tar file installation"'
+    echo "for instructions on how to safely install this package to your system."
+    echo
 else
     echo "Debian OS detected."
     arch=$(dpkg --print-architecture)

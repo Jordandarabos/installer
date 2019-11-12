@@ -15,7 +15,13 @@ curl -LkO https://raw.githubusercontent.com/remoteit/installer/master/scripts/au
 chmod +x ./auto-install.sh
 sudo ./auto-install.sh
 ```
-This script tests all available daemon architectures, then downloads a compatible package.  If your system is Debian based, a deb package file will be downloaded and installed.  Otherwise a tar file is downloaded and installed.
+This script tests all available daemon architectures, then downloads a compatible package.  If your system is Debian based, a deb package file will be downloaded and installed.  Otherwise a tar file is downloaded.
+
+IMPORTANT NOTICE:
+
+    Please visit https://docs.remote.it and search for "tar file installation"
+    for instructions on how to safely install this package to your system.
+
 
 Now you should have the `connectd` tools installed on your system. To run the installer, type:
 
