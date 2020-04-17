@@ -7,6 +7,7 @@
 #       GSW.
 
 VERSION=2.4.26
+MODIFIED="April 16, 2020"
 BUILDPATH=https://github.com/remoteit/installer/releases/download/v$VERSION
 LOGFILE=remote.itBinaryTestLog.txt
 
@@ -249,11 +250,11 @@ if [ $useTar -eq 1 ]; then
             downloadAndTestDaemon $daemon
         fi
         if [ "$?" != 0 ]; then
-            daemon=mipsel-bmc5354-static
+            daemon=mipsel-bmc5354_static
             downloadAndTestDaemon $daemon
         fi
         if [ "$?" != 0 ]; then
-            daemon=mipsel-gcc342-static
+            daemon=mipsel-gcc342_static
             downloadAndTestDaemon $daemon
         fi
         if [ "$?" != 0 ]; then
