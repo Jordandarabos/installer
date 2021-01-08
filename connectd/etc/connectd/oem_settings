@@ -40,7 +40,7 @@ oemGetDefaultHardwareId()
 # 
 
 # get the default interface - this is the one currently connected to the internet
-interface=$(oemGetInterface)
+# interface=$(oemGetInterface)
 
 ## 
 ## Override the default interface - change and uncomment the assignment below
@@ -50,14 +50,14 @@ interface=$(oemGetInterface)
 #interface='enp3s0'
 
 # get the adapter MAC
-if [ -f "/sys/class/net/$interface/address" ]; then
-    hw_mac=$(cat /sys/class/net/$interface/address | sed 's/://g')
-else 
-    hw_mac="Issue: hardware ID is not set properly.  Fix oemGetDefaultHardwareId() in /etc/connectd/oem_settings."
-fi
+# if [ -f "/sys/class/net/$interface/address" ]; then
+#     hw_mac=$(cat /sys/class/net/$interface/address | sed 's/://g')
+# else 
+#     hw_mac="Issue: hardware ID is not set properly.  Fix oemGetDefaultHardwareId() in /etc/connectd/oem_settings."
+# fi
 
-echo $hw_mac
-
+# echo $hw_mac
+oemGetSystemId
 }
 
 oemGetDefaultRegistrationKey()
@@ -73,25 +73,26 @@ oemGetDefaultRegistrationKey()
 #  This will only work on Raspberry Pi with both eth0 and wlan0 adapters.
 #  Edit these expressions to suit the specific platform you are using.
 
-    interface=$(oemGetInterface)
-    if [ $interface = "wlan0" ]; then
-         interface="eth0"
-    elif [ "$interface" = "eth0" ]; then
-         interface="wlan0"
-    fi
-# get the adapter MAC
-    if [ -f "/sys/class/net/$interface/address" ]; then
-        rk_mac=$(cat /sys/class/net/$interface/address | sed 's/://g')
-    else
-        interface='wlp2s0'
-        if [ -f "/sys/class/net/$interface/address" ]; then
-	    rk_mac=$(cat /sys/class/net/$interface/address | sed 's/://g')
-        else
-            rk_mac="Issue: registration key is not set properly.  Fix oemGetDefaultRegistrationKey() in /etc/connectd/oem_settings"
-        fi
-    fi
+#     interface=$(oemGetInterface)
+#     if [ $interface = "wlan0" ]; then
+#          interface="eth0"
+#     elif [ "$interface" = "eth0" ]; then
+#          interface="wlan0"
+#     fi
+# # get the adapter MAC
+#     if [ -f "/sys/class/net/$interface/address" ]; then
+#         rk_mac=$(cat /sys/class/net/$interface/address | sed 's/://g')
+#     else
+#         interface='wlp2s0'
+#         if [ -f "/sys/class/net/$interface/address" ]; then
+# 	    rk_mac=$(cat /sys/class/net/$interface/address | sed 's/://g')
+#         else
+#             rk_mac="Issue: registration key is not set properly.  Fix oemGetDefaultRegistrationKey() in /etc/connectd/oem_settings"
+#         fi
+#     fi
 
-    echo $rk_mac
+#     echo $rk_mac
+oemGetSystemId
 }
 
 oemGetTCPServices()
