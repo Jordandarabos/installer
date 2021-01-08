@@ -34,22 +34,22 @@ echo $cpuid
 oemGetDefaultHardwareId()
 {
 
-#
-#  This method gets the hardware ID based on the default LAN MAC address
-#  You can overide the network interface below for a custom configuration for your platform
-# 
+# #
+# #  This method gets the hardware ID based on the default LAN MAC address
+# #  You can overide the network interface below for a custom configuration for your platform
+# # 
 
-# get the default interface - this is the one currently connected to the internet
+# # get the default interface - this is the one currently connected to the internet
 # interface=$(oemGetInterface)
 
-## 
-## Override the default interface - change and uncomment the assignment below
-## RPi interfaces: eth0, wlan0
-## Ubuntu interfaces: enp3s0 wlp2s0
-#interface='eth0'
-#interface='enp3s0'
+# ## 
+# ## Override the default interface - change and uncomment the assignment below
+# ## RPi interfaces: eth0, wlan0
+# ## Ubuntu interfaces: enp3s0 wlp2s0
+# #interface='eth0'
+# #interface='enp3s0'
 
-# get the adapter MAC
+# # get the adapter MAC
 # if [ -f "/sys/class/net/$interface/address" ]; then
 #     hw_mac=$(cat /sys/class/net/$interface/address | sed 's/://g')
 # else 
@@ -58,20 +58,21 @@ oemGetDefaultHardwareId()
 
 # echo $hw_mac
 oemGetSystemId
+
 }
 
 oemGetDefaultRegistrationKey()
 {
  
-## 
-## Override the default interface - change the assignment below
-## RPi interfaces: eth0, wlan0
-## Ubuntu interfaces: enp3s0 wlp2s0
+# ## 
+# ## Override the default interface - change the assignment below
+# ## RPi interfaces: eth0, wlan0
+# ## Ubuntu interfaces: enp3s0 wlp2s0
 
-## interface must be set to something for your platform - default is for RPi, second option common for Ubuntu
-#  The logic below detects the default interface and chooses the other one to use for the Registration Key.
-#  This will only work on Raspberry Pi with both eth0 and wlan0 adapters.
-#  Edit these expressions to suit the specific platform you are using.
+# ## interface must be set to something for your platform - default is for RPi, second option common for Ubuntu
+# #  The logic below detects the default interface and chooses the other one to use for the Registration Key.
+# #  This will only work on Raspberry Pi with both eth0 and wlan0 adapters.
+# #  Edit these expressions to suit the specific platform you are using.
 
 #     interface=$(oemGetInterface)
 #     if [ $interface = "wlan0" ]; then
